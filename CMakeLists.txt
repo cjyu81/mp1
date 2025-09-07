@@ -1,24 +1,37 @@
-cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
-project(cs521_mp1 LANGUAGES CUDA CXX)
+cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
+
+# Option to skip GPU build
+option(CPU_ONLY "Build only CPU implementation" OFF)
+
+if(CPU_ONLY)
+    project(cs521_mp1 LANGUAGES CXX)
+else()
+    project(cs521_mp1 LANGUAGES CUDA CXX)
+endif()
 
 set(CMAKE_CUDA_STANDARD 14)
 set(CMAKE_CUDA_STANDARD_REQUIRED ON)
-set(CMAKE_CUDA_ARCHITECTURES 75)
 
-# Find CUDA toolkit
-find_package(OpenMP)
-find_package(CUDAToolkit REQUIRED)
-if (OPENMP_FOUND)
-    set(OpenMP_CXX_FLAGS "-fopenmp")
+# Only set architectures if CUDA is enabled
+if(NOT CPU_ONLY)
+    set(CMAKE_CUDA_ARCHITECTURES 75)
+endif()
+
+# Find OpenMP
+find_package(OpenMP REQUIRED)
+if (OpenMP_CXX_FOUND)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
-else ()
+else()
     message(FATAL_ERROR "Need OpenMP")
-endif ()
+endif()
 
+# CPU target
 add_executable(mp1_cpu ../cpu/gemm_cpu.cpp)
-add_executable(mp1_gpu ../gpu/gemm_gpu.cu)
-#set_target_properties(mp1 PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 
-#target_link_libraries(mp1 CUDA::cudart)
-target_link_libraries(mp1_gpu PRIVATE CUDA::cublas CUDA::cublasLt)
+# GPU target only if CUDA is enabled
+if(NOT CPU_ONLY)
+    find_package(CUDAToolkit REQUIRED)
+    add_executable(mp1_gpu ../gpu/gemm_gpu.cu)
+    target_link_libraries(mp1_gpu PRIVATE CUDA::cublas CUDA::cublasLt)
+endif()
