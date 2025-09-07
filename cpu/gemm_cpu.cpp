@@ -12,21 +12,20 @@
   };								
   
 #define TIME(name) \
-  for (int i = 0; i < 1; i++)						\
-    {									\
-      name(A, B, C, M, N, K);						\
-    }									\
-  std::chrono::duration<double, std::milli> time_ ## name;		\
-  for (int i = 0; i < NUM_RUNS; i++)					\
-    {									\
-      initialize(C, M * N);						\
+  for (int i = 0; i < 1; i++) { \
+      name(A, B, C, M, N, K); \
+  } \
+  std::chrono::duration<double, std::milli> time_ ## name(0); \
+  for (int i = 0; i < NUM_RUNS; i++) { \
+      initialize(C, M * N); \
       auto start_time_ ## name = std::chrono::high_resolution_clock::now(); \
-      name(A, B, C, M, N, K);						\
+      name(A, B, C, M, N, K); \
       auto end_time_ ## name = std::chrono::high_resolution_clock::now(); \
-      time_ ## name += end_time_ ## name - start_time_ ## name;		\
-    }									\
-std::chrono::duration<double, std::milli> duration_ ## name = time_ ## name/float(NUM_RUNS); \
-  std::cout << "Time taken for GEMM (CPU," << #name <<"): " << duration_ ## name.count() << "ms" << std::endl; 
+      time_ ## name += end_time_ ## name - start_time_ ## name; \
+  } \
+  std::chrono::duration<double, std::milli> duration_ ## name = time_ ## name / float(NUM_RUNS); \
+  std::cout << "Time taken for GEMM (CPU," << #name << "): " << duration_ ## name.count() << "ms" << std::endl;
+
 
 
 // reference CPU implementation of the GEMM kernel
@@ -45,9 +44,9 @@ void gemm_cpu_o0(float* A, float* B, float *C, int M, int N, int K) {
 // Your optimized implementations go here
 // note that for o4 you don't have to change the code, but just the compiler flags. So, you can use o3's code for that part
 void gemm_cpu_o1(float* A, float* B, float *C, int M, int N, int K) {
+      for (int k = 0; k < K; k++) {
   for (int i = 0; i < M; i++) {
   	for (int j = 0; j < N; j++) {
-      for (int k = 0; k < K; k++) {
 		C[i * N + j]  += A[i * K + k]  * B[k * N + j];
       }
     }
@@ -56,9 +55,9 @@ void gemm_cpu_o1(float* A, float* B, float *C, int M, int N, int K) {
 }
 
 void gemm_cpu_o2(float* A, float* B, float *C, int M, int N, int K) {
-  for (int j = 0; j < N; j++) {
-    for (int i = 0; i < M; i++) {
       for (int k = 0; k < K; k++) {
+  	for (int j = 0; j < N; j++) {
+  for (int i = 0; i < M; i++) {
 		C[i * N + j]  += A[i * K + k]  * B[k * N + j];
       }
     }

@@ -2,7 +2,7 @@
 Machine Project 1
 Charlie Jyu 9/4/25
 
-Commands:
+Commands (from debug):
 cd C:\Users\charl\Documents\GitHub\mp1\build
 cmake --build .
 cd Debug
