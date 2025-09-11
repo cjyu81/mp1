@@ -1,4 +1,4 @@
-// Generated with Grok (AI/LLM)
+// Generated with AI
 #include <chrono>
 #include <algorithm>
 #include "../include/utils.h"

@@ -17,13 +17,25 @@ if(NOT CPU_ONLY)
     set(CMAKE_CUDA_ARCHITECTURES 75)
 endif()
 
-# Find OpenMP
-find_package(OpenMP REQUIRED)
-if (OpenMP_CXX_FOUND)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+# --- OpenMP setup ---
+if(MSVC)
+    message(STATUS "Detected MSVC: enabling /openmp:experimental")
+    # /FAcs → generate assembly files alongside .obj
+    # /O2 → optimize
+    # /arch:AVX2 → enable AVX2/FMA
+    # /fp:fast → allow floating-point reassociation (enables FMA fusion)
+    add_compile_options(/openmp:experimental /O2 /arch:AVX2 /fp:fast /FAcs)
 else()
-    message(FATAL_ERROR "Need OpenMP")
+    find_package(OpenMP REQUIRED)
+    if (OpenMP_CXX_FOUND)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+    else()
+        message(FATAL_ERROR "Need OpenMP")
+    endif()
+
+    # Add vectorization + FMA
+    add_compile_options(-O3 -march=native -mfma -ffast-math -S -fverbose-asm)
 endif()
 
 # CPU target

@@ -8,6 +8,16 @@ cmake --build .
 cd Debug
 .\mp1_cpu.exe 5000 5000 5000
 
+
+Commands to clean build(from mp1):
+rm -r -fo build
+mkdir build
+cd build
+cmake .. -DCPU_ONLY=ON
+cmake --build .
+cd Debug
+.\mp1_cpu.exe 5000 5000 5000
+
 Results
 PS C:\Users\charl\Documents\GitHub\mp1\build\Debug> .\mp1_cpu.exe 5000 5000 5000
 checking gemm_cpu_o0
@@ -37,3 +47,12 @@ Time taken for GEMM (CPU,gemm_cpu_kji): 1.54729e+06ms
 Time taken for GEMM (CPU,gemm_cpu_kij): 360055ms
 Time taken for GEMM (CPU,gemm_cpu_ikj): 380022ms
 Time taken for GEMM (CPU,gemm_cpu_ijk): 924629ms
+
+
+Timing all loop orderings...
+Time taken for GEMM (CPU,gemm_cpu_jik): 677446ms
+Time taken for GEMM (CPU,gemm_cpu_jki): 1.43882e+06ms
+Time taken for GEMM (CPU,gemm_cpu_kji): 1.4234e+06ms
+Time taken for GEMM (CPU,gemm_cpu_kij): 342483ms
+Time taken for GEMM (CPU,gemm_cpu_ikj): 361395ms
+Time taken for GEMM (CPU,gemm_cpu_ijk): 1.19003e+06ms
