@@ -21,19 +21,21 @@ endif()
 
 # Find OpenMP
 find_package(OpenMP REQUIRED)
+
+# CPU target
+add_executable(mp1_cpu ../cpu/gemm_cpu.cpp)
+
+# Apply OpenMP flags
 if (OpenMP_CXX_FOUND)
     if (MSVC)
         target_compile_options(mp1_cpu PRIVATE /openmp:experimental)
     else()
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+        target_compile_options(mp1_cpu PRIVATE ${OpenMP_CXX_FLAGS})
+        target_link_libraries(mp1_cpu PRIVATE ${OpenMP_CXX_FLAGS})
     endif()
 else()
     message(FATAL_ERROR "Need OpenMP")
 endif()
-
-# CPU target
-add_executable(mp1_cpu ../cpu/gemm_cpu.cpp)
 
 # Apply optimization + FMA flags depending on USE_FMA
 if (MSVC)
