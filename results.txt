@@ -121,3 +121,19 @@ Time taken for GEMM (CPU,gemm_cpu_o0): 0.0001ms
 Time taken for GEMM (CPU,gemm_cpu_o1): 0.00105ms
 Time taken for GEMM (CPU,gemm_cpu_o2): 0.0001ms
 Time taken for GEMM (CPU,gemm_cpu_o3): 66777.9ms
+
+PS C:\Users\charl\Documents\GitHub\mp1\build> .\Release\mp1_cpu.exe 10000 10000 10000
+checking gemm_cpu_o0
+fail at: 0, values: 0 vs. 22
+gemm_cpu_o0: check ref failed!
+checking gemm_cpu_o1
+fail at: 0, values: 0 vs. 22
+gemm_cpu_o1: check ref failed!
+checking gemm_cpu_o2
+fail at: 0, values: 0 vs. 22
+gemm_cpu_o2: check ref failed!
+checking gemm_cpu_o3
+Time taken for GEMM (CPU,gemm_cpu_o0): 5e-05ms
+Time taken for GEMM (CPU,gemm_cpu_o1): 5e-05ms
+Time taken for GEMM (CPU,gemm_cpu_o2): 5e-05ms
+Time taken for GEMM (CPU,gemm_cpu_o3): 1.38772e+06ms
