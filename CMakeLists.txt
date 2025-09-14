@@ -6,23 +6,27 @@ option(CPU_ONLY "Build only CPU implementation" OFF)
 # Option to toggle FMA
 option(USE_FMA "Enable fused-multiply-add vectorization" ON)
 
+# Project
 if(CPU_ONLY)
     project(cs521_mp1 LANGUAGES CXX)
 else()
     project(cs521_mp1 LANGUAGES CUDA CXX)
 endif()
 
-set(CMAKE_CUDA_STANDARD 14)
-set(CMAKE_CUDA_STANDARD_REQUIRED ON)
-
+# C++ and CUDA standards
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if(NOT CPU_ONLY)
-    set(CMAKE_CUDA_ARCHITECTURES 75)
+    set(CMAKE_CUDA_STANDARD 14)
+    set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 endif()
 
 # Find OpenMP
 find_package(OpenMP REQUIRED)
 
+# -------------------
 # CPU target
+# -------------------
 add_executable(mp1_cpu ../cpu/gemm_cpu.cpp)
 
 # Apply OpenMP flags
@@ -34,20 +38,18 @@ if (OpenMP_CXX_FOUND)
         target_link_libraries(mp1_cpu PRIVATE ${OpenMP_CXX_FLAGS})
     endif()
 else()
-    message(FATAL_ERROR "Need OpenMP")
+    message(FATAL_ERROR "OpenMP required for CPU target")
 endif()
 
-# Apply optimization + FMA flags depending on USE_FMA
+# CPU optimization + FMA flags
 if (MSVC)
     if (USE_FMA)
-        message(STATUS "FMA enabled")
         target_compile_options(mp1_cpu PRIVATE
             $<$<CONFIG:Release>:/O2>
             $<$<CONFIG:Release>:/fp:fast>
             $<$<CONFIG:Release>:/arch:AVX2>
         )
     else()
-        message(STATUS "FMA disabled")
         target_compile_options(mp1_cpu PRIVATE
             $<$<CONFIG:Release>:/O2>
             $<$<CONFIG:Release>:/fp:precise>
@@ -56,9 +58,24 @@ if (MSVC)
     endif()
 endif()
 
-# GPU target only if CUDA is enabled
+# -------------------
+# GPU target
+# -------------------
 if(NOT CPU_ONLY)
     find_package(CUDAToolkit REQUIRED)
+
     add_executable(mp1_gpu ../gpu/gemm_gpu.cu)
     target_link_libraries(mp1_gpu PRIVATE CUDA::cublas CUDA::cublasLt)
+
+    # Explicitly target T4 GPU
+    set_target_properties(mp1_gpu PROPERTIES
+        CUDA_ARCHITECTURES "75"
+        CUDA_STANDARD 14
+        CUDA_SEPARABLE_COMPILATION ON
+    )
+
+    # Extra nvcc flags to force correct PTX
+    set_target_properties(mp1_gpu PROPERTIES
+        CUDA_FLAGS "--generate-code=arch=compute_75,code=sm_75"
+    )
 endif()
