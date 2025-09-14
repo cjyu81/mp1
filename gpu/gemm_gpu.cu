@@ -124,19 +124,19 @@ void gemm_gpu_o1(float* A, float* B, float* C, int M, int N, int K)
 	gemm_gpu_o1_kernel<<<gridSize, blockSize>>>(A, B, C, M, N, K);
 }
 
-const int tilesize = 8;
+const int tilesize_o2 = 8;
 __global__ void gemm_gpu_o2_kernel(float* A, float* B, float *C, int M, int N, int K) {
 		// GPU shared memory shared across warps on a Streaming Multiprocessor
-		__shared__ float sharedA[tilesize][tilesize];
-		__shared__ float sharedB[tilesize][tilesize];
-		int i = blockIdx.x * tilesize + threadIdx.x; //col
-		int j = blockIdx.y * tilesize + threadIdx.y; //row
+		__shared__ float sharedA[tilesize_o2][tilesize_o2];
+		__shared__ float sharedB[tilesize_o2][tilesize_o2];
+		int i = blockIdx.x * tilesize_o2 + threadIdx.x; //col
+		int j = blockIdx.y * tilesize_o2 + threadIdx.y; //row
 		float sum = 0.0f;
 
-		for(int a=0;a<(K+tilesize-1)/tilesize;a++){
+		for(int a=0;a<(K+tilesize_o2-1)/tilesize_o2;a++){
 			// Memory Coalescing
-			int Acol = a*tilesize + threadIdx.x;
-			int Brow = a*tilesize + threadIdx.y;
+			int Acol = a*tilesize_o2 + threadIdx.x;
+			int Brow = a*tilesize_o2 + threadIdx.y;
 			if(j<M && Acol<K){
 				sharedA[threadIdx.y][threadIdx.x] = A[j*K+Acol];
 			}
@@ -151,7 +151,7 @@ __global__ void gemm_gpu_o2_kernel(float* A, float* B, float *C, int M, int N, i
 			}
 			// Sync threads to get true shared A and shared B
 			__syncthreads();
-			for(int b=0;b<tilesize;b++){
+			for(int b=0;b<tilesize_o2;b++){
 				sum += sharedA[threadIdx.y][b] * sharedB[b][threadIdx.x];
 			}
 			// Sync again to get true sum
@@ -167,17 +167,57 @@ __global__ void gemm_gpu_o2_kernel(float* A, float* B, float *C, int M, int N, i
 void gemm_gpu_o2(float* A, float* B, float* C, int M, int N, int K)
 {
 	// Init block and grid size
-	dim3 blockSize(tilesize, tilesize);
-	dim3 gridSize((N+tilesize-1)/tilesize, (M+tilesize-1)/tilesize);
-	gemm_gpu_o1_kernel<<<gridSize, blockSize>>>(A, B, C, M, N, K);
+	dim3 blockSize(tilesize_o2, tilesize_o2);
+	dim3 gridSize((N+tilesize_o2-1)/tilesize_o2, (M+tilesize_o2-1)/tilesize_o2);
+	gemm_gpu_o2_kernel<<<gridSize, blockSize>>>(A, B, C, M, N, K);
 	
 }
 
+const int tilesize_o3 = 16;
 __global__ void gemm_gpu_o3_kernel(float* A, float* B, float *C, int M, int N, int K) {
+		// GPU shared memory shared across warps on a Streaming Multiprocessor
+		__shared__ float sharedA[tilesize_o3][tilesize_o3];
+		__shared__ float sharedB[tilesize_o3][tilesize_o3];
+		int i = blockIdx.x * tilesize_o3 + threadIdx.x; //col
+		int j = blockIdx.y * tilesize_o3 + threadIdx.y; //row
+		float sum = 0.0f;
+
+		for(int a=0;a<(K+tilesize_o3-1)/tilesize_o3;a++){
+			// Memory Coalescing
+			int Acol = a*tilesize_o3 + threadIdx.x;
+			int Brow = a*tilesize_o3 + threadIdx.y;
+			if(j<M && Acol<K){
+				sharedA[threadIdx.y][threadIdx.x] = A[j*K+Acol];
+			}
+			else{
+				sharedA[threadIdx.y][threadIdx.x] = 0.0f;
+			}
+			if(Brow<K && i<N){
+				sharedB[threadIdx.y][threadIdx.x] = B[Brow * N + i];
+			}
+			else{
+				sharedB[threadIdx.y][threadIdx.x] =  0.0f;
+			}
+			// Sync threads to get true shared A and shared B
+			__syncthreads();
+			for(int b=0;b<tilesize_o3;b++){
+				sum += sharedA[threadIdx.y][b] * sharedB[b][threadIdx.x];
+			}
+			// Sync again to get true sum
+			__syncthreads();
+		}
+		if(j<M && i<N){
+			C[j*N+i] = sum;
+		}
+		// one index (j,i) computed after all threads synced
 }
 void gemm_gpu_o3(float* A, float* B, float* C, int M, int N, int K)
 {
 	// Init block and grid size
+	dim3 blockSize(tilesize_o3, tilesize_o3);
+	dim3 gridSize((N+tilesize_o3-1)/tilesize_o3, (M+tilesize_o3-1)/tilesize_o3);
+	gemm_gpu_o3_kernel<<<gridSize, blockSize>>>(A, B, C, M, N, K);
+	
 }
 
 
