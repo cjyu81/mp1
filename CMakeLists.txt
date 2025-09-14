@@ -63,18 +63,17 @@ endif()
 # -------------------
 if(NOT CPU_ONLY)
     find_package(CUDAToolkit REQUIRED)
-
     add_executable(mp1_gpu ../gpu/gemm_gpu.cu)
     target_link_libraries(mp1_gpu PRIVATE CUDA::cublas CUDA::cublasLt)
 
-    # Explicitly target T4 GPU
+    # Explicitly compile for Tesla T4
     set_target_properties(mp1_gpu PROPERTIES
         CUDA_ARCHITECTURES "75"
         CUDA_STANDARD 14
         CUDA_SEPARABLE_COMPILATION ON
     )
 
-    # Extra nvcc flags to force correct PTX
+    # Ensure nvcc generates code only for T4
     set_target_properties(mp1_gpu PROPERTIES
         CUDA_FLAGS "--generate-code=arch=compute_75,code=sm_75"
     )
