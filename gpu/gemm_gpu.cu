@@ -104,24 +104,74 @@ void gemm_gpu_o0(float* A, float* B, float* C, int M, int N, int K)
 
 // The scafolding for optimized GEMM implementations
 __global__ void gemm_gpu_o1_kernel(float* A, float* B, float *C, int M, int N, int K) {
-	int i = threadIdx.x;
-	int j = threadIdx.y;
-	int k = blockIdx.x;
-	C[i * N + j]  += A[i * K + k]  * B[k * N + j];
+	int i = blockIdx.x * blockDim.x + threadIdx.x;
+	int j = blockIdx.y * blockDim.y + threadIdx.y;
+	if(j<M && i<N){
+		float value = 0.0f;
+		for(int k=0;k<K;k++){
+			value += A[j*K+k] * B[k*N+i];
+		}
+		C[j*N+i] = value;
+	}
 }
+
 void gemm_gpu_o1(float* A, float* B, float* C, int M, int N, int K)
 {
 	// Grid is made of blocks. Block is made of threads
-	dim3 blockSize(8,8);
-	dim3 gridSize(8,1);
-	gemm_gpu_o0_kernel<<<gridSize, blockSize>>>(A, B, C, M, N, K);
+	const int blockdim = 16;
+	dim3 blockSize(blockdim, blockdim);
+	dim3 gridSize((N+blockdim-1)/blockdim, (M+blockdim-1)/blockdim);
+	gemm_gpu_o1_kernel<<<gridSize, blockSize>>>(A, B, C, M, N, K);
 }
 
+const int tilesize = 8;
 __global__ void gemm_gpu_o2_kernel(float* A, float* B, float *C, int M, int N, int K) {
+		// GPU shared memory shared across warps on a Streaming Multiprocessor
+		__shared__ float sharedA[tilesize][tilesize];
+		__shared__ float sharedB[tilesize][tilesize];
+		int i = blockIdx.x * tilesize + threadIdx.x; //col
+		int j = blockIdx.y * tilesize + threadIdx.y; //row
+		float sum = 0.0f;
+
+		for(int a=0;a<(K+tilesize-1)/tilesize;a++){
+			// Memory Coalescing
+			int Acol = a*tilesize + threadIdx.x;
+			int Brow = a*tilesize + threadIdx.y;
+			if(j<M && Acol<K){
+				sharedA[threadIdx.y][threadIdx.x] = A[j*K+Acol];
+			}
+			else{
+				sharedA[threadIdx.y][threadIdx.x] = 0.0f;
+			}
+			if(Brow<K && i<N){
+				sharedB[threadIdx.y][threadIdx.x] = B[Brow * N + i];
+			}
+			else{
+				sharedB[threadIdx.y][threadIdx.x] =  0.0f;
+			}
+			// Sync threads to get true shared A and shared B
+			__syncthreads();
+			for(int b=0;b<tilesize;b++){
+				sum += sharedA[threadIdx.y][b] * sharedB[b][threadIdx.x];
+			}
+			// Sync again to get true sum
+			__syncthreads();
+		}
+		if(j<M && i<N){
+			C[j*N+i] = sum;
+		}
+		// one index (j,i) computed after all threads synced
+
 }
+
 void gemm_gpu_o2(float* A, float* B, float* C, int M, int N, int K)
 {
 	// Init block and grid size
+	const int blockdim = 16;
+	dim3 blockSize(tilesize, tilesize);
+	dim3 gridSize((N+tilesize-1)/tilesize, (M+tilesize-1)/tilesize);
+	gemm_gpu_o1_kernel<<<gridSize, blockSize>>>(A, B, C, M, N, K);
+	
 }
 
 __global__ void gemm_gpu_o3_kernel(float* A, float* B, float *C, int M, int N, int K) {
