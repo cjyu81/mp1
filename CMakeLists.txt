@@ -73,8 +73,6 @@ if(NOT CPU_ONLY)
         CUDA_SEPARABLE_COMPILATION ON
     )
 
-    # Ensure nvcc generates code only for T4
-    set_target_properties(mp1_gpu PROPERTIES
-        CUDA_FLAGS "--generate-code=arch=compute_75,code=sm_75"
-    )
+    # Optional: Add explicit NVCC flags if needed
+    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -arch=sm_75 -gencode=arch=compute_75,code=sm_75")
 endif()
