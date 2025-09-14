@@ -1,7 +1,5 @@
-# exhaustivegpu
 #include "../include/utils.h"
 #include <cuda_runtime.h>
-#include <cublas_v2.h>
 
 #define NUM_RUNS 10
 
@@ -126,19 +124,19 @@ void gemm_gpu_o1(float* A, float* B, float* C, int M, int N, int K)
 	gemm_gpu_o1_kernel<<<gridSize, blockSize>>>(A, B, C, M, N, K);
 }
 
-template <int TILE>
-__global__ void gemm_gpu_o2_o3_kernel(float* A, float* B, float *C, int M, int N, int K) {
+const int tilesize_o2 = 8;
+__global__ void gemm_gpu_o2_kernel(float* A, float* B, float *C, int M, int N, int K) {
 		// GPU shared memory shared across warps on a Streaming Multiprocessor
-		__shared__ float sharedA[TILE][TILE];
-		__shared__ float sharedB[TILE][TILE];
-		int i = blockIdx.x * TILE + threadIdx.x; //col
-		int j = blockIdx.y * TILE + threadIdx.y; //row
+		__shared__ float sharedA[tilesize_o2][tilesize_o2];
+		__shared__ float sharedB[tilesize_o2][tilesize_o2];
+		int i = blockIdx.x * tilesize_o2 + threadIdx.x; //col
+		int j = blockIdx.y * tilesize_o2 + threadIdx.y; //row
 		float sum = 0.0f;
 
-		for(int a=0;a<(K+TILE-1)/TILE;a++){
+		for(int a=0;a<(K+tilesize_o2-1)/tilesize_o2;a++){
 			// Memory Coalescing
-			int Acol = a*TILE + threadIdx.x;
-			int Brow = a*TILE + threadIdx.y;
+			int Acol = a*tilesize_o2 + threadIdx.x;
+			int Brow = a*tilesize_o2 + threadIdx.y;
 			if(j<M && Acol<K){
 				sharedA[threadIdx.y][threadIdx.x] = A[j*K+Acol];
 			}
@@ -153,7 +151,7 @@ __global__ void gemm_gpu_o2_o3_kernel(float* A, float* B, float *C, int M, int N
 			}
 			// Sync threads to get true shared A and shared B
 			__syncthreads();
-			for(int b=0;b<TILE;b++){
+			for(int b=0;b<tilesize_o2;b++){
 				sum += sharedA[threadIdx.y][b] * sharedB[b][threadIdx.x];
 			}
 			// Sync again to get true sum
@@ -169,51 +167,60 @@ __global__ void gemm_gpu_o2_o3_kernel(float* A, float* B, float *C, int M, int N
 void gemm_gpu_o2(float* A, float* B, float* C, int M, int N, int K)
 {
 	// Init block and grid size
-	const int tilesize = 8;
-	dim3 blockSize(tilesize, tilesize);
-	dim3 gridSize((N+tilesize-1)/tilesize, (M+tilesize-1)/tilesize);
-	gemm_gpu_o2_o3_kernel<8><<<gridSize, blockSize>>>(A, B, C, M, N, K);
+	dim3 blockSize(tilesize_o2, tilesize_o2);
+	dim3 gridSize((N+tilesize_o2-1)/tilesize_o2, (M+tilesize_o2-1)/tilesize_o2);
+	gemm_gpu_o2_kernel<<<gridSize, blockSize>>>(A, B, C, M, N, K);
 	
 }
 
-void gemm_gpu_o3_8(float* A, float* B, float* C, int M, int N, int K)
+const int tilesize_o3 = 16;
+__global__ void gemm_gpu_o3_kernel(float* A, float* B, float *C, int M, int N, int K) {
+		// GPU shared memory shared across warps on a Streaming Multiprocessor
+		__shared__ float sharedA[tilesize_o3][tilesize_o3];
+		__shared__ float sharedB[tilesize_o3][tilesize_o3];
+		int i = blockIdx.x * tilesize_o3 + threadIdx.x; //col
+		int j = blockIdx.y * tilesize_o3 + threadIdx.y; //row
+		float sum = 0.0f;
+
+		for(int a=0;a<(K+tilesize_o3-1)/tilesize_o3;a++){
+			// Memory Coalescing
+			int Acol = a*tilesize_o3 + threadIdx.x;
+			int Brow = a*tilesize_o3 + threadIdx.y;
+			if(j<M && Acol<K){
+				sharedA[threadIdx.y][threadIdx.x] = A[j*K+Acol];
+			}
+			else{
+				sharedA[threadIdx.y][threadIdx.x] = 0.0f;
+			}
+			if(Brow<K && i<N){
+				sharedB[threadIdx.y][threadIdx.x] = B[Brow * N + i];
+			}
+			else{
+				sharedB[threadIdx.y][threadIdx.x] =  0.0f;
+			}
+			// Sync threads to get true shared A and shared B
+			__syncthreads();
+			for(int b=0;b<tilesize_o3;b++){
+				sum += sharedA[threadIdx.y][b] * sharedB[b][threadIdx.x];
+			}
+			// Sync again to get true sum
+			__syncthreads();
+		}
+		if(j<M && i<N){
+			C[j*N+i] = sum;
+		}
+		// one index (j,i) computed after all threads synced
+}
+void gemm_gpu_o3(float* A, float* B, float* C, int M, int N, int K)
 {
 	// Init block and grid size
-	const int tilesize = 8;
-	dim3 blockSize(tilesize, tilesize);
-	dim3 gridSize((N+tilesize-1)/tilesize, (M+tilesize-1)/tilesize);
-	gemm_gpu_o2_o3_kernel<8><<<gridSize, blockSize>>>(A, B, C, M, N, K);
+	dim3 blockSize(tilesize_o3, tilesize_o3);
+	dim3 gridSize((N+tilesize_o3-1)/tilesize_o3, (M+tilesize_o3-1)/tilesize_o3);
+	gemm_gpu_o3_kernel<<<gridSize, blockSize>>>(A, B, C, M, N, K);
 	
 }
 
-void gemm_gpu_o3_16(float* A, float* B, float* C, int M, int N, int K)
-{
-	// Init block and grid size
-	const int tilesize = 16;
-	dim3 blockSize(tilesize, tilesize);
-	dim3 gridSize((N+tilesize-1)/tilesize, (M+tilesize-1)/tilesize);
-	gemm_gpu_o2_o3_kernel<16><<<gridSize, blockSize>>>(A, B, C, M, N, K);
-	
-}
 
-void gemm_gpu_o3_32(float* A, float* B, float* C, int M, int N, int K)
-{
-	// Init block and grid size
-	const int tilesize = 32;
-	dim3 blockSize(tilesize, tilesize);
-	dim3 gridSize((N+tilesize-1)/tilesize, (M+tilesize-1)/tilesize);
-	gemm_gpu_o2_o3_kernel<32><<<gridSize, blockSize>>>(A, B, C, M, N, K);
-	
-}
-
-void gemm_gpu_cublas(float* d_A, float* d_B, float* d_C, int M, int N, int K) {
-    cublasHandle_t handle;
-    CUDA_CHECK(cublasCreate(&handle));
-    float alpha = 1.0f;
-    float beta = 0.0f;
-    CUDA_CHECK(cublasSgemm(handle, CUBLAS_OP_T, CUBLAS_OP_T, N, M, K, &alpha, d_B, N, d_A, K, &beta, d_C, N));
-    CUDA_CHECK(cublasDestroy(handle));
-}
 
 int main(int argc, char* argv[]) {
 	if (argc < 3) {
@@ -240,17 +247,13 @@ int main(int argc, char* argv[]) {
  	CHECK(gemm_gpu_o0)
 	CHECK(gemm_gpu_o1)
 	CHECK(gemm_gpu_o2)
-	CHECK(gemm_gpu_o3_16)
-	CHECK(gemm_gpu_cublas)
+	CHECK(gemm_gpu_o3)
 
 	// Actual run
  	TIME(gemm_gpu_o0)
 	TIME(gemm_gpu_o1)
 	TIME(gemm_gpu_o2)
-	TIME(gemm_gpu_o3_8)
-	TIME(gemm_gpu_o3_16)
-	TIME(gemm_gpu_o3_32)
-	TIME(gemm_gpu_cublas)
+	TIME(gemm_gpu_o3)
 
 	cudaFreeHost(A);
 	cudaFreeHost(B);
