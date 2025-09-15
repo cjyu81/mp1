@@ -128,7 +128,6 @@ __global__ void gemm_gpu_o1_kernel(float* A, float* B, float *C, int M, int N, i
 }
 
 void gemm_gpu_o1(float* A, float* B, float* C, int M, int N, int K) {
-	return;
     const int blockdim = 16;
     dim3 blockSize(blockdim, blockdim);
     dim3 gridSize((N + blockdim - 1) / blockdim, (M + blockdim - 1) / blockdim);
@@ -168,7 +167,6 @@ __global__ void gemm_gpu_o2_o3_kernel(float* A, float* B, float *C, int M, int N
 }
 
 void gemm_gpu_o2(float* A, float* B, float* C, int M, int N, int K) {
-	return;
     const int tilesize = 8;
     dim3 blockSize(tilesize, tilesize);
     dim3 gridSize((N + tilesize - 1) / tilesize, (M + tilesize - 1) / tilesize);

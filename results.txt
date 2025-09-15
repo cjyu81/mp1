@@ -106,7 +106,7 @@ Time taken for GEMM (CPU,gemm_cpu_o2): 5e-05ms
 Time taken for GEMM (CPU,gemm_cpu_o3): 812.961ms
 
 
-PS C:\Users\charl\Documents\GitHub\mp1\build> .\Release\mp1_cpu.exe 5000 5000 5000
+.\Release\mp1_cpu.exe 5000 5000 5000
 checking gemm_cpu_o0
 fail at: 0, values: 0 vs. 22
 gemm_cpu_o0: check ref failed!
@@ -117,10 +117,10 @@ checking gemm_cpu_o2
 fail at: 0, values: 0 vs. 22
 gemm_cpu_o2: check ref failed!
 checking gemm_cpu_o3
-Time taken for GEMM (CPU,gemm_cpu_o0): 0.0001ms
-Time taken for GEMM (CPU,gemm_cpu_o1): 0.00105ms
-Time taken for GEMM (CPU,gemm_cpu_o2): 0.0001ms
-Time taken for GEMM (CPU,gemm_cpu_o3): 66777.9ms
+Time taken for GEMM (CPU,gemm_cpu_o0): 0ms
+Time taken for GEMM (CPU,gemm_cpu_o1): 0ms
+Time taken for GEMM (CPU,gemm_cpu_o2): 5e-05ms
+Time taken for GEMM (CPU,gemm_cpu_o3): 44997ms
 
 PS C:\Users\charl\Documents\GitHub\mp1\build> .\Release\mp1_cpu.exe 10000 10000 10000
 checking gemm_cpu_o0
@@ -264,3 +264,92 @@ Time taken for GEMM (GPU, gemm_gpu_o3_8): 5.90565ms
 Time taken for GEMM (GPU, gemm_gpu_o3_16): 2.598ms
 Time taken for GEMM (GPU, gemm_gpu_o3_32): 2.13886ms
 Time taken for GEMM (GPU, gemm_gpu_cublas): 0.607642ms
+
+
+
+!git pull
+!nvcc ../gpu/gemm_gpu.cu -arch=sm_75 -o mp1_gpu -lcublas
+!./mp1_gpu 100 100 100
+!./mp1_gpu 1000 1000 1000
+!./mp1_gpu 5000 5000 5000
+!./mp1_gpu 10000 10000 10000
+checking gemm_gpu_o0
+fail at: 0, values: 0 vs. 22
+check ref failed!
+checking gemm_gpu_o1
+fail at: 0, values: 0 vs. 22
+check ref failed!
+checking gemm_gpu_o2
+fail at: 0, values: 0 vs. 22
+check ref failed!
+checking gemm_gpu_o3_8
+checking gemm_gpu_o3_16
+checking gemm_gpu_o3_32
+checking gemm_gpu_cublas
+Time taken for GEMM (GPU, gemm_gpu_o0): 0.0025472ms
+Time taken for GEMM (GPU, gemm_gpu_o1): 0.0023328ms
+Time taken for GEMM (GPU, gemm_gpu_o2): 0.0027232ms
+Time taken for GEMM (GPU, gemm_gpu_o3_8): 0.018016ms
+Time taken for GEMM (GPU, gemm_gpu_o3_16): 0.0198176ms
+Time taken for GEMM (GPU, gemm_gpu_o3_32): 0.0286592ms
+Time taken for GEMM (GPU, gemm_gpu_cublas): 0.361594ms
+checking gemm_gpu_o0
+fail at: 0, values: 0 vs. 22
+check ref failed!
+checking gemm_gpu_o1
+fail at: 0, values: 0 vs. 22
+check ref failed!
+checking gemm_gpu_o2
+fail at: 0, values: 0 vs. 22
+check ref failed!
+checking gemm_gpu_o3_8
+checking gemm_gpu_o3_16
+checking gemm_gpu_o3_32
+checking gemm_gpu_cublas
+Time taken for GEMM (GPU, gemm_gpu_o0): 0.0028736ms
+Time taken for GEMM (GPU, gemm_gpu_o1): 0.0028416ms
+Time taken for GEMM (GPU, gemm_gpu_o2): 0.0028512ms
+Time taken for GEMM (GPU, gemm_gpu_o3_8): 7.22703ms
+Time taken for GEMM (GPU, gemm_gpu_o3_16): 5.55397ms
+Time taken for GEMM (GPU, gemm_gpu_o3_32): 3.34149ms
+Time taken for GEMM (GPU, gemm_gpu_cublas): 0.706218ms
+checking gemm_gpu_o0
+fail at: 0, values: 0 vs. 22
+check ref failed!
+checking gemm_gpu_o1
+fail at: 0, values: 0 vs. 22
+check ref failed!
+checking gemm_gpu_o2
+fail at: 0, values: 0 vs. 22
+check ref failed!
+checking gemm_gpu_o3_8
+checking gemm_gpu_o3_16
+checking gemm_gpu_o3_32
+checking gemm_gpu_cublas
+Time taken for GEMM (GPU, gemm_gpu_o0): 0.003056ms
+Time taken for GEMM (GPU, gemm_gpu_o1): 0.0028576ms
+Time taken for GEMM (GPU, gemm_gpu_o2): 0.0028832ms
+Time taken for GEMM (GPU, gemm_gpu_o3_8): 531.796ms
+Time taken for GEMM (GPU, gemm_gpu_o3_16): 333.342ms
+Time taken for GEMM (GPU, gemm_gpu_o3_32): 268.351ms
+Time taken for GEMM (GPU, gemm_gpu_cublas): 44.4556ms
+checking gemm_gpu_o0
+fail at: 0, values: 0 vs. 22
+check ref failed!
+checking gemm_gpu_o1
+fail at: 0, values: 0 vs. 22
+check ref failed!
+checking gemm_gpu_o2
+fail at: 0, values: 0 vs. 22
+check ref failed!
+checking gemm_gpu_o3_8
+checking gemm_gpu_o3_16
+checking gemm_gpu_o3_32
+checking gemm_gpu_cublas
+Time taken for GEMM (GPU, gemm_gpu_o0): 0.0030368ms
+Time taken for GEMM (GPU, gemm_gpu_o1): 0.0030848ms
+Time taken for GEMM (GPU, gemm_gpu_o2): 0.002736ms
+Time taken for GEMM (GPU, gemm_gpu_o3_8): 4816.26ms
+Time taken for GEMM (GPU, gemm_gpu_o3_16): 3039.52ms
+Time taken for GEMM (GPU, gemm_gpu_o3_32): 2397.23ms
+Time taken for GEMM (GPU, gemm_gpu_cublas): 513.054ms

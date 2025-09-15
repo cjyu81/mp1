@@ -51,7 +51,6 @@ void gemm_cpu_o0(float *A, float *B, float *C, int M, int N, int K)
 // note that for o4 you don't have to change the code, but just the compiler flags. So, you can use o3's code for that part
 void gemm_cpu_o1(float *A, float *B, float *C, int M, int N, int K)
 {
-  return;
   for (int k = 0; k < K; k++)
   {
     for (int i = 0; i < M; i++)
@@ -67,7 +66,6 @@ void gemm_cpu_o1(float *A, float *B, float *C, int M, int N, int K)
 // 640 KB L1 Cache
 void gemm_cpu_o2(float *A, float *B, float *C, int M, int N, int K)
 {
-  return;
   const int STRIDE = 32;
   for (int k = 0; k < K; k++)
   {
