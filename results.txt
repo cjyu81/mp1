@@ -159,3 +159,17 @@ Trying to launch kernel with tilesize 128
 Already up to date.
 ptxas error   : Entry function '_Z21gemm_gpu_o2_o3_kernelILi128EEvPfS0_S0_iii' uses too much shared data (0x20000 bytes, 0x10000 max)
 /bin/bash: line 1: ./mp1_gpu: No such file or directory
+
+Run with max tilesize 64
+
+checking gemm_gpu_cublas
+Time taken for GEMM (GPU, gemm_gpu_o0): 0.0031264ms
+Time taken for GEMM (GPU, gemm_gpu_o1): 9.20075ms
+Time taken for GEMM (GPU, gemm_gpu_o2): 5.39901ms
+Time taken for GEMM (GPU, gemm_gpu_o3_8): 5.39691ms
+Time taken for GEMM (GPU, gemm_gpu_o3_16): 3.15676ms
+Time taken for GEMM (GPU, gemm_gpu_o3_32): 2.09985ms
+CUDA Error: invalid configuration argument
+Time taken for GEMM (GPU, gemm_gpu_o3_64): 0.002768ms
+CUDA Error: invalid configuration argument
+Time taken for GEMM (GPU, gemm_gpu_cublas): 0.683766ms
