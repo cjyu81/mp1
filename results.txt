@@ -154,3 +154,8 @@ Time taken for GEMM (GPU, gemm_gpu_o3_8): 0.0078752ms
 Time taken for GEMM (GPU, gemm_gpu_o3_16): 0.0082304ms
 Time taken for GEMM (GPU, gemm_gpu_o3_32): 0.012336ms
 Time taken for GEMM (GPU, gemm_gpu_cublas): 0.358435ms
+
+Trying to launch kernel with tilesize 128
+Already up to date.
+ptxas error   : Entry function '_Z21gemm_gpu_o2_o3_kernelILi128EEvPfS0_S0_iii' uses too much shared data (0x20000 bytes, 0x10000 max)
+/bin/bash: line 1: ./mp1_gpu: No such file or directory

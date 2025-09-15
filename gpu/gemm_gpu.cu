@@ -202,13 +202,6 @@ void gemm_gpu_o3_64(float* A, float* B, float* C, int M, int N, int K) {
 }
 
 
-void gemm_gpu_o3_128(float* A, float* B, float* C, int M, int N, int K) {
-    const int tilesize = 128;
-    dim3 blockSize(tilesize, tilesize);
-    dim3 gridSize((N + tilesize - 1) / tilesize, (M + tilesize - 1) / tilesize);
-    gemm_gpu_o2_o3_kernel<128><<<gridSize, blockSize>>>(A, B, C, M, N, K);
-}
-
 // Modified gemm_gpu_cublas function
 void gemm_gpu_cublas(float* d_A, float* d_B, float* d_C, int M, int N, int K) {
     cublasHandle_t handle;
@@ -247,7 +240,6 @@ int main(int argc, char* argv[]) {
     CHECK(gemm_gpu_o3_16)
     CHECK(gemm_gpu_o3_32)
     CHECK(gemm_gpu_o3_64)
-    CHECK(gemm_gpu_o3_128)
     CHECK(gemm_gpu_cublas)
 
     // Time implementations
@@ -258,7 +250,6 @@ int main(int argc, char* argv[]) {
     TIME(gemm_gpu_o3_16)
     TIME(gemm_gpu_o3_32)
     TIME(gemm_gpu_o3_64)
-    TIME(gemm_gpu_o3_128)
     TIME(gemm_gpu_cublas)
 
     cudaFreeHost(A);
