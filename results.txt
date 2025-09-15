@@ -133,10 +133,10 @@ checking gemm_cpu_o2
 fail at: 0, values: 0 vs. 22
 gemm_cpu_o2: check ref failed!
 checking gemm_cpu_o3
-Time taken for GEMM (CPU,gemm_cpu_o0): 5e-05ms
+Time taken for GEMM (CPU,gemm_cpu_o0): 0ms
 Time taken for GEMM (CPU,gemm_cpu_o1): 5e-05ms
 Time taken for GEMM (CPU,gemm_cpu_o2): 5e-05ms
-Time taken for GEMM (CPU,gemm_cpu_o3): 1.38772e+06ms
+Time taken for GEMM (CPU,gemm_cpu_o3): 408330ms
 
 EXHAUSTIVE FOR GPU
 !./mp1_gpu 16 16 16
