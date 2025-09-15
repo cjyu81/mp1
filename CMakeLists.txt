@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
+cmake_policy(SET CMP0104 NEW)
 
 # Option to skip GPU build
 option(CPU_ONLY "Build only CPU implementation" OFF)
@@ -65,6 +66,7 @@ if(NOT CPU_ONLY)
     find_package(CUDAToolkit REQUIRED)
     add_executable(mp1_gpu ../gpu/gemm_gpu.cu)
     target_link_libraries(mp1_gpu PRIVATE CUDA::cublas CUDA::cublasLt)
+    target_compile_options(mp1_gpu PRIVATE -lcublas)
 
     # Explicitly compile for Tesla T4
     set_target_properties(mp1_gpu PROPERTIES
@@ -73,6 +75,6 @@ if(NOT CPU_ONLY)
         CUDA_SEPARABLE_COMPILATION ON
     )
 
-    # Optional: Add explicit NVCC flags if needed
-    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -arch=sm_75 -gencode=arch=compute_75,code=sm_75")
+    # Ensure nvcc generates code only for T4
+    target_compile_options(mp1_gpu PRIVATE --generate-code=arch=compute_75,code=sm_75)
 endif()

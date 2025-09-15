@@ -137,3 +137,20 @@ Time taken for GEMM (CPU,gemm_cpu_o0): 5e-05ms
 Time taken for GEMM (CPU,gemm_cpu_o1): 5e-05ms
 Time taken for GEMM (CPU,gemm_cpu_o2): 5e-05ms
 Time taken for GEMM (CPU,gemm_cpu_o3): 1.38772e+06ms
+
+EXHAUSTIVE FOR GPU
+
+checking gemm_gpu_o0
+checking gemm_gpu_o1
+checking gemm_gpu_o2
+checking gemm_gpu_o3_8
+checking gemm_gpu_o3_16
+checking gemm_gpu_o3_32
+checking gemm_gpu_cublas
+Time taken for GEMM (GPU, gemm_gpu_o0): 0.45383ms
+Time taken for GEMM (GPU, gemm_gpu_o1): 0.00824ms
+Time taken for GEMM (GPU, gemm_gpu_o2): 0.0082336ms
+Time taken for GEMM (GPU, gemm_gpu_o3_8): 0.0078752ms
+Time taken for GEMM (GPU, gemm_gpu_o3_16): 0.0082304ms
+Time taken for GEMM (GPU, gemm_gpu_o3_32): 0.012336ms
+Time taken for GEMM (GPU, gemm_gpu_cublas): 0.358435ms
