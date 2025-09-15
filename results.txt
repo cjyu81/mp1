@@ -192,3 +192,75 @@ CUDA Error: invalid configuration argument
 Time taken for GEMM (GPU, gemm_gpu_o3_64): 0.002768ms
 CUDA Error: invalid configuration argument
 Time taken for GEMM (GPU, gemm_gpu_cublas): 0.683766ms
+
+
+!./mp1_gpu 100 100 100
+!./mp1_gpu 1000 1000 1000
+checking gemm_gpu_o0
+fail at: 0, values: 0 vs. 22
+check ref failed!
+checking gemm_gpu_o1
+checking gemm_gpu_o2
+checking gemm_gpu_o3_8
+checking gemm_gpu_o3_16
+checking gemm_gpu_o3_32
+checking gemm_gpu_cublas
+Time taken for GEMM (GPU, gemm_gpu_o0): 0.0028288ms
+Time taken for GEMM (GPU, gemm_gpu_o1): 0.0212736ms
+Time taken for GEMM (GPU, gemm_gpu_o2): 0.0180224ms
+Time taken for GEMM (GPU, gemm_gpu_o3_8): 0.0184672ms
+Time taken for GEMM (GPU, gemm_gpu_o3_16): 0.0200384ms
+Time taken for GEMM (GPU, gemm_gpu_o3_32): 0.0284ms
+Time taken for GEMM (GPU, gemm_gpu_cublas): 0.348954ms
+checking gemm_gpu_o0
+fail at: 0, values: 0 vs. 22
+check ref failed!
+checking gemm_gpu_o1
+checking gemm_gpu_o2
+checking gemm_gpu_o3_8
+checking gemm_gpu_o3_16
+checking gemm_gpu_o3_32
+checking gemm_gpu_cublas
+Time taken for GEMM (GPU, gemm_gpu_o0): 0.0028864ms
+Time taken for GEMM (GPU, gemm_gpu_o1): 7.10741ms
+Time taken for GEMM (GPU, gemm_gpu_o2): 5.64823ms
+Time taken for GEMM (GPU, gemm_gpu_o3_8): 3.94311ms
+Time taken for GEMM (GPU, gemm_gpu_o3_16): 2.95123ms
+Time taken for GEMM (GPU, gemm_gpu_o3_32): 2.88133ms
+Time taken for GEMM (GPU, gemm_gpu_cublas): 0.6444ms
+
+!./mp1_gpu 100 100 100
+!./mp1_gpu 1000 1000 1000
+Already up to date.
+checking gemm_gpu_o0
+fail at: 0, values: 0 vs. 22
+check ref failed!
+checking gemm_gpu_o1
+checking gemm_gpu_o2
+checking gemm_gpu_o3_8
+checking gemm_gpu_o3_16
+checking gemm_gpu_o3_32
+checking gemm_gpu_cublas
+Time taken for GEMM (GPU, gemm_gpu_o0): 0.0025088ms
+Time taken for GEMM (GPU, gemm_gpu_o1): 0.0217248ms
+Time taken for GEMM (GPU, gemm_gpu_o2): 0.0178656ms
+Time taken for GEMM (GPU, gemm_gpu_o3_8): 0.0204032ms
+Time taken for GEMM (GPU, gemm_gpu_o3_16): 0.019856ms
+Time taken for GEMM (GPU, gemm_gpu_o3_32): 0.0282432ms
+Time taken for GEMM (GPU, gemm_gpu_cublas): 0.344602ms
+checking gemm_gpu_o0
+fail at: 0, values: 0 vs. 22
+check ref failed!
+checking gemm_gpu_o1
+checking gemm_gpu_o2
+checking gemm_gpu_o3_8
+checking gemm_gpu_o3_16
+checking gemm_gpu_o3_32
+checking gemm_gpu_cublas
+Time taken for GEMM (GPU, gemm_gpu_o0): 0.0028704ms
+Time taken for GEMM (GPU, gemm_gpu_o1): 7.10303ms
+Time taken for GEMM (GPU, gemm_gpu_o2): 5.90511ms
+Time taken for GEMM (GPU, gemm_gpu_o3_8): 5.90565ms
+Time taken for GEMM (GPU, gemm_gpu_o3_16): 2.598ms
+Time taken for GEMM (GPU, gemm_gpu_o3_32): 2.13886ms
+Time taken for GEMM (GPU, gemm_gpu_cublas): 0.607642ms
