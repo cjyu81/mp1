@@ -139,7 +139,7 @@ Time taken for GEMM (CPU,gemm_cpu_o2): 5e-05ms
 Time taken for GEMM (CPU,gemm_cpu_o3): 1.38772e+06ms
 
 EXHAUSTIVE FOR GPU
-
+!./mp1_gpu 16 16 16
 checking gemm_gpu_o0
 checking gemm_gpu_o1
 checking gemm_gpu_o2
@@ -154,6 +154,25 @@ Time taken for GEMM (GPU, gemm_gpu_o3_8): 0.0078752ms
 Time taken for GEMM (GPU, gemm_gpu_o3_16): 0.0082304ms
 Time taken for GEMM (GPU, gemm_gpu_o3_32): 0.012336ms
 Time taken for GEMM (GPU, gemm_gpu_cublas): 0.358435ms
+
+!./mp1_gpu 1024 1024 1024
+Already up to date.
+checking gemm_gpu_o0
+fail at: 0, values: 0 vs. 22
+check ref failed!
+checking gemm_gpu_o1
+checking gemm_gpu_o2
+checking gemm_gpu_o3_8
+checking gemm_gpu_o3_16
+checking gemm_gpu_o3_32
+checking gemm_gpu_cublas
+Time taken for GEMM (GPU, gemm_gpu_o0): 0.0030848ms
+Time taken for GEMM (GPU, gemm_gpu_o1): 9.1946ms
+Time taken for GEMM (GPU, gemm_gpu_o2): 6.03273ms
+Time taken for GEMM (GPU, gemm_gpu_o3_8): 6.03348ms
+Time taken for GEMM (GPU, gemm_gpu_o3_16): 2.46504ms
+Time taken for GEMM (GPU, gemm_gpu_o3_32): 2.09538ms
+Time taken for GEMM (GPU, gemm_gpu_cublas): 0.608102ms
 
 Trying to launch kernel with tilesize 128
 Already up to date.
