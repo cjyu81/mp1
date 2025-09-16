@@ -1,4 +1,5 @@
 // Partially generated with AI
+// Generated after implementing o1-o3 of Part 2 by hand
 #include "../include/utils.h"
 #include <cuda_runtime.h>
 #include <cublas_v2.h>
