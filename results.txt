@@ -399,3 +399,12 @@ Time taken for GEMM (CPU,gemm_cpu_o0): 0.0001ms
 Time taken for GEMM (CPU,gemm_cpu_o1): 1.00877e+06ms
 Time taken for GEMM (CPU,gemm_cpu_o2): 645303ms
 Time taken for GEMM (CPU,gemm_cpu_o3): 165542ms
+FMA Enabled so it is o4:
+PS C:\Users\charl\Documents\GitHub\mp1\build> .\Release\mp1_cpu.exe 100 100 100
+Time taken for GEMM (CPU,gemm_cpu_o4): 0.08305ms
+PS C:\Users\charl\Documents\GitHub\mp1\build> .\Release\mp1_cpu.exe 1000 1000 1000
+Time taken for GEMM (CPU,gemm_cpu_o4): 21.1148ms
+PS C:\Users\charl\Documents\GitHub\mp1\build> .\Release\mp1_cpu.exe 5000 5000 5000
+Time taken for GEMM (CPU,gemm_cpu_o4): 2515.91ms
+PS C:\Users\charl\Documents\GitHub\mp1\build> .\Release\mp1_cpu.exe 10000 10000 10000
+Time taken for GEMM (CPU,gemm_cpu_o4): 30549.3ms

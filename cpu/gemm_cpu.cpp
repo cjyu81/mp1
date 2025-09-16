@@ -97,7 +97,7 @@ void gemm_cpu_o2(float *A, float *B, float *C, int M, int N, int K)
 void gemm_cpu_o3(float *A, float *B, float *C, int M, int N, int K)
 {
     const int STRIDE = 32;
-    
+    // No race condition
     #pragma omp parallel for
     for (int i = 0; i < M; i += STRIDE)
     {
@@ -105,7 +105,6 @@ void gemm_cpu_o3(float *A, float *B, float *C, int M, int N, int K)
         {
             for (int j = 0; j < N; j += STRIDE)
             {
-                // Get boundaries manually instea dof if statement to satisfy compiler requirements
                 int i_end = (i + STRIDE < M) ? i + STRIDE : M;
                 int k_end = (k + STRIDE < K) ? k + STRIDE : K;
                 int j_end = (j + STRIDE < N) ? j + STRIDE : N;
@@ -115,10 +114,14 @@ void gemm_cpu_o3(float *A, float *B, float *C, int M, int N, int K)
                     for (int kk = k; kk < k_end; kk++)
                     {
                         float a_ik = A[ii * K + kk];
+                        // Data coalescing
+                        float *c_row = &C[ii * N + j];
+                        float *b_row = &B[kk * N + j];
+                        
                         #pragma omp simd
-                        for (int jj = j; jj < j_end; jj++)
+                        for (int jj = 0; jj < (j_end - j); jj++)
                         {
-                            C[ii * N + jj] += a_ik * B[kk * N + jj];
+                            c_row[jj] += a_ik * b_row[jj];
                         }
                     }
                 }
