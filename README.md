@@ -10,32 +10,27 @@ cd Debug
 
 
 Commands to clean build(from mp1):
+cd C:\Users\charl\Documents\GitHub\mp1
 rm -r -fo build
 mkdir build
 cd build
 cmake .. -DCPU_ONLY=ON
 cmake --build .
 cd Debug
+.\mp1_cpu.exe 100 100 100
+.\mp1_cpu.exe 1000 1000 1000
 .\mp1_cpu.exe 5000 5000 5000
+.\mp1_cpu.exe 10000 10000 10000
 
 
-Build with FMA:
 cd ..
 rm -r -fo build
 mkdir build
 cd build
 cmake .. -DCPU_ONLY=ON -DUSE_FMA=ON
 cmake --build . --config Release
-.\Release\mp1_cpu.exe 500 500 500
-
-
-Build without FMA:
-cd ..
-rm -r -fo build
-mkdir build
-cd build
-cmake .. -DCPU_ONLY=ON -DUSE_FMA=OFF
-cmake --build . --config Release
 .\Release\mp1_cpu.exe 100 100 100
 .\Release\mp1_cpu.exe 1000 1000 1000
+.\Release\mp1_cpu.exe 5000 5000 5000
+.\Release\mp1_cpu.exe 10000 10000 10000
 

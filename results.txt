@@ -353,3 +353,49 @@ Time taken for GEMM (GPU, gemm_gpu_o3_8): 4816.26ms
 Time taken for GEMM (GPU, gemm_gpu_o3_16): 3039.52ms
 Time taken for GEMM (GPU, gemm_gpu_o3_32): 2397.23ms
 Time taken for GEMM (GPU, gemm_gpu_cublas): 513.054ms
+
+New CPU Results:
+PS C:\Users\charl\Documents\GitHub\mp1\build> .\Release\mp1_cpu.exe 100 100 100
+checking gemm_cpu_o0
+fail at: 0, values: 0 vs. 22
+gemm_cpu_o0: check ref failed!
+checking gemm_cpu_o1
+checking gemm_cpu_o2
+checking gemm_cpu_o3
+Time taken for GEMM (CPU,gemm_cpu_o0): 0ms
+Time taken for GEMM (CPU,gemm_cpu_o1): 0.50075ms
+Time taken for GEMM (CPU,gemm_cpu_o2): 0.9788ms
+Time taken for GEMM (CPU,gemm_cpu_o3): 0.40405ms
+PS C:\Users\charl\Documents\GitHub\mp1\build> .\Release\mp1_cpu.exe 1000 1000 1000
+checking gemm_cpu_o0
+fail at: 0, values: 0 vs. 22
+gemm_cpu_o0: check ref failed!
+checking gemm_cpu_o1
+checking gemm_cpu_o2
+checking gemm_cpu_o3
+Time taken for GEMM (CPU,gemm_cpu_o0): 5e-05ms
+Time taken for GEMM (CPU,gemm_cpu_o1): 455.722ms
+Time taken for GEMM (CPU,gemm_cpu_o2): 710.769ms
+Time taken for GEMM (CPU,gemm_cpu_o3): 141.655ms
+PS C:\Users\charl\Documents\GitHub\mp1\build> .\Release\mp1_cpu.exe 5000 5000 5000
+checking gemm_cpu_o0
+fail at: 0, values: 0 vs. 22
+gemm_cpu_o0: check ref failed!
+checking gemm_cpu_o1
+checking gemm_cpu_o2
+checking gemm_cpu_o3
+Time taken for GEMM (CPU,gemm_cpu_o0): 0.0001ms
+Time taken for GEMM (CPU,gemm_cpu_o1): 79765.3ms
+Time taken for GEMM (CPU,gemm_cpu_o2): 80989.4ms
+Time taken for GEMM (CPU,gemm_cpu_o3): 18330.6ms
+PS C:\Users\charl\Documents\GitHub\mp1\build> .\Release\mp1_cpu.exe 10000 10000 10000
+checking gemm_cpu_o0
+fail at: 0, values: 0 vs. 22
+gemm_cpu_o0: check ref failed!
+checking gemm_cpu_o1
+checking gemm_cpu_o2
+checking gemm_cpu_o3
+Time taken for GEMM (CPU,gemm_cpu_o0): 0.0001ms
+Time taken for GEMM (CPU,gemm_cpu_o1): 1.00877e+06ms
+Time taken for GEMM (CPU,gemm_cpu_o2): 645303ms
+Time taken for GEMM (CPU,gemm_cpu_o3): 165542ms

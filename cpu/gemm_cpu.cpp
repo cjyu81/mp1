@@ -51,9 +51,10 @@ void gemm_cpu_o0(float *A, float *B, float *C, int M, int N, int K)
 // note that for o4 you don't have to change the code, but just the compiler flags. So, you can use o3's code for that part
 void gemm_cpu_o1(float *A, float *B, float *C, int M, int N, int K)
 {
-  for (int k = 0; k < K; k++)
+  return;
+  for (int i = 0; i < M; i++)
   {
-    for (int i = 0; i < M; i++)
+    for (int k = 0; k < K; k++)
     {
       for (int j = 0; j < N; j++)
       {
@@ -66,42 +67,64 @@ void gemm_cpu_o1(float *A, float *B, float *C, int M, int N, int K)
 // 640 KB L1 Cache
 void gemm_cpu_o2(float *A, float *B, float *C, int M, int N, int K)
 {
-  const int STRIDE = 32;
-  for (int k = 0; k < K; k++)
-  {
+  return;
+    const int STRIDE = 32;
     for (int i = 0; i < M; i += STRIDE)
     {
-      for (int j = 0; j < N; j += STRIDE)
-      {
-        for(int ii = i; ii < std::min(i + STRIDE,M);ii++){
-          for(int jj = j; jj < std::min(j + STRIDE, N); jj++){
-            C[ii * N + jj] += A[ii * K + k] * B[k * N + jj];
-          }
+        for (int k = 0; k < K; k += STRIDE)
+        {
+            for (int j = 0; j < N; j += STRIDE)
+            {
+                for (int ii = i; ii < i + STRIDE; ii++)
+                {
+                    if (ii >= M) break;
+                    for (int kk = k; kk < k + STRIDE; kk++)
+                    {
+                        if (kk >= K) break;
+                        float a_ik = A[ii * K + kk];
+                        for (int jj = j; jj < j + STRIDE; jj++)
+                        {
+                            if (jj >= N) break;
+                            C[ii * N + jj] += a_ik * B[kk * N + jj];
+                        }
+                    }
+                }
+            }
         }
-      }
     }
-  }
 }
 
 void gemm_cpu_o3(float *A, float *B, float *C, int M, int N, int K)
 {
-  const int STRIDE = 32;
-  for (int k = 0; k < K; k++)
-  {
-    #pragma omp parallel for collapse(2) // No race conditions
+    const int STRIDE = 32;
+    
+    #pragma omp parallel for
     for (int i = 0; i < M; i += STRIDE)
     {
-      for (int j = 0; j < N; j += STRIDE)
-      {
-        for(int ii = i; ii < std::min(i + STRIDE,M);ii++){
-          #pragma omp simd // data in loop is contiguous
-          for(int jj = j; jj < std::min(j + STRIDE, N); jj++){
-            C[ii * N + jj] += A[ii * K + k] * B[k * N + jj];
-          }
+        for (int k = 0; k < K; k += STRIDE)
+        {
+            for (int j = 0; j < N; j += STRIDE)
+            {
+                // Get boundaries manually instea dof if statement to satisfy compiler requirements
+                int i_end = (i + STRIDE < M) ? i + STRIDE : M;
+                int k_end = (k + STRIDE < K) ? k + STRIDE : K;
+                int j_end = (j + STRIDE < N) ? j + STRIDE : N;
+                
+                for (int ii = i; ii < i_end; ii++)
+                {
+                    for (int kk = k; kk < k_end; kk++)
+                    {
+                        float a_ik = A[ii * K + kk];
+                        #pragma omp simd
+                        for (int jj = j; jj < j_end; jj++)
+                        {
+                            C[ii * N + jj] += a_ik * B[kk * N + jj];
+                        }
+                    }
+                }
+            }
         }
-      }
     }
-  }
 }
 
 int main(int argc, char *argv[])
